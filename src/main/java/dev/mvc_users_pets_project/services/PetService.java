@@ -1,6 +1,7 @@
 package dev.mvc_users_pets_project.services;
 
 import dev.mvc_users_pets_project.model.PetDto;
+import dev.mvc_users_pets_project.model.UserDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class PetService {
                 petDto.userId()
         );
 
-        pets.put(newId, petDto);
+        pets.put(newId, newPet);
         return newPet;
     }
 
@@ -42,12 +43,12 @@ public class PetService {
         return pets.values().stream().toList();
     }
 
-    public PetDto updatePet(PetDto petDto) {
-        if (pets.get(petDto.id()) == null) {
+    public PetDto updatePet(Long id, PetDto petDto) {
+        if (pets.get(id) == null) {
             throw new IllegalArgumentException(PET_NOT_FOUND);
         }
         var newPet = new PetDto(
-                id.get(),
+                id,
                 petDto.name(),
                 petDto.userId()
         );
@@ -65,8 +66,27 @@ public class PetService {
     }
 
     public void deletePetsByUserId(long userId) {
-//        pets.values().stream()
-//                .filter(p -> p.userId() == userId)
-//                .forEach(p -> p = null);
+        pets.values().stream()
+                .filter(p -> p.userId() == userId)
+                .forEach((p) -> pets.remove(p.id()));
+    }
+
+    public void updatePetsByUser(UserDto updatedUser) {
+        if (updatedUser == null || updatedUser.id() == null) {
+            throw new IllegalArgumentException("User Not Found");
+        }
+
+        for (PetDto pet : updatedUser.pets()) {
+            if (pet.id() == null) {
+                throw new IllegalArgumentException("Updated User has a pet with null id");
+            }
+        }
+
+        pets.values().stream()
+                .filter(p -> p.userId().equals(updatedUser.id()))
+                .forEach(p -> pets.remove(p.id()));
+
+        updatedUser.pets()
+                .forEach(p -> pets.put(p.id(), p));
     }
 }

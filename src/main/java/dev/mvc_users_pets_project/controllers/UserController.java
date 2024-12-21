@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
@@ -30,9 +32,9 @@ public class UserController {
         this.petService = petService;
     }
 
-    @PostMapping("/users/add")
+    @PostMapping("/add")
     public ResponseEntity<UserDto> createUser(
-            @RequestBody UserDto userDto
+            @RequestBody @Valid UserDto userDto
     ) {
         log.info("Get request: (Post) Creating user: {}", userDto);
         UserDto createdUser = userService.saveUser(userDto);
@@ -42,38 +44,39 @@ public class UserController {
                 .body(createdUser);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public UserDto getUserById(
-            @PathVariable @Valid long id
+            @PathVariable long id
     ) {
         var user = userService.findUserById(id);
         log.info("Get request: (Get) Get user: {}", user);
         return user;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public List<UserDto> getAllUsers() {
         List<UserDto> getAllUsers = userService.getAllUsers();
         log.info("Get request: (Get) Get all users: {}", getAllUsers);
         return getAllUsers;
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     public UserDto updateUser(
             @PathVariable("id") Long id,
             @RequestBody @Valid UserDto userDto) {
         UserDto updatedUser = userService.updateUser(id, userDto);
         log.info("Get request: (Put) Updated user: {}", updatedUser);
+        petService.updatePetsByUser(updatedUser);
         return updatedUser;
     }
 
-    @DeleteMapping("/users/delete")
+    @DeleteMapping("/delete")
     public UserDto deleteUser(
             @RequestParam Long id
     ) {
         UserDto userDto = userService.deleteUser(id);
+        log.info("Get request: (Delete) Deleted user: {}", userDto);
         petService.deletePetsByUserId(userDto.id());
-        log.info("Get request: (Delete) Deleted user: {}", id);
         return userDto;
     }
 }

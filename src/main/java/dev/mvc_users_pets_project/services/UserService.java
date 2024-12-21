@@ -1,5 +1,6 @@
 package dev.mvc_users_pets_project.services;
 
+import dev.mvc_users_pets_project.Pet;
 import dev.mvc_users_pets_project.model.PetDto;
 import dev.mvc_users_pets_project.model.UserDto;
 import org.springframework.stereotype.Service;
@@ -76,5 +77,28 @@ public class UserService {
             throw new NoSuchElementException(USER_NOT_FOUND);
         }
         users.get(userId).pets().add(petToAdd);
+    }
+
+    public void deletePetFromUser(PetDto petToRemove) {
+        if (petToRemove.userId() == null) {
+            throw new NoSuchElementException(USER_NOT_FOUND);
+        }
+        boolean removed = users.get(petToRemove.userId()).pets().remove(petToRemove);
+        if (!removed) {
+            throw new NoSuchElementException("Pet not found");
+        }
+    }
+
+    public void changePetToUser(PetDto updatePet) {
+        var userId = updatePet.userId();
+        if (users.get(userId) == null) {
+            throw new NoSuchElementException(USER_NOT_FOUND);
+        }
+
+        for (UserDto user : users.values()) {
+            user.pets().removeIf(pet -> pet.id().equals(updatePet.id()));
+        }
+
+        users.get(userId).pets().add(updatePet);
     }
 }
