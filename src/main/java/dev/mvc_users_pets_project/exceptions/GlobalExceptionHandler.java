@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
         log.error("Received an illegal argument", ex);
 
         var errorMessageResponse = new ErrorMessageResponse(
-                "Illegal error.",
+                "Illegal argument error.",
                 ex.getMessage(),
                 LocalDateTime.now()
         );
@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
         log.error("Received an element not found", ex);
 
         var errorMessageResponse = new ErrorMessageResponse(
-                "No such element not found.",
+                "No such element found.",
                 ex.getMessage(),
                 LocalDateTime.now()
         );

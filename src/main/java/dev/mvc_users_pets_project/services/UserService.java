@@ -1,6 +1,5 @@
 package dev.mvc_users_pets_project.services;
 
-import dev.mvc_users_pets_project.Pet;
 import dev.mvc_users_pets_project.model.PetDto;
 import dev.mvc_users_pets_project.model.UserDto;
 import org.springframework.stereotype.Service;

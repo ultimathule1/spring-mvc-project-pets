@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -32,7 +33,7 @@ public record UserDto (
         @Max(value = 130, message = "The user too old")
         Integer age,
 
-        @NotNull
+        @NonNull
         List<PetDto> pets
     ){
     public UserDto(Long id, String firstName, String email, Integer ages) {

@@ -1,6 +1,5 @@
 package dev.mvc_users_pets_project.controllers;
 
-import dev.mvc_users_pets_project.Pet;
 import dev.mvc_users_pets_project.model.PetDto;
 import dev.mvc_users_pets_project.services.PetService;
 import dev.mvc_users_pets_project.services.UserService;
