@@ -91,7 +91,7 @@ public class UserControllerTest {
         UserDto user = createTestUser();
         userService.saveUser(user);
 
-        mockMvc.perform(delete(BASE_URL + "/" + idForDelete))
+        mockMvc.perform(delete(BASE_URL + "/delete?id=" + idForDelete))
                 .andExpect(status().is(HttpStatus.OK.value()));
     }
 
@@ -120,5 +120,4 @@ public class UserControllerTest {
                 18
         );
     }
-
 }
