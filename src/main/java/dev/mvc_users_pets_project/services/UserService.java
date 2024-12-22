@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class UserService {
     Map<Long, UserDto> users;
     AtomicLong idCounter;
-    private final String USER_NOT_FOUND= "User not found";
+    private final String USER_NOT_FOUND = "User not found";
 
     public UserService() {
         users = new ConcurrentHashMap<>();
@@ -72,7 +72,7 @@ public class UserService {
 
     public void addPetToUser(PetDto petToAdd) {
         var userId = petToAdd.userId();
-        if(users.get(userId) == null) {
+        if (users.get(userId) == null) {
             throw new NoSuchElementException(USER_NOT_FOUND);
         }
         users.get(userId).pets().add(petToAdd);

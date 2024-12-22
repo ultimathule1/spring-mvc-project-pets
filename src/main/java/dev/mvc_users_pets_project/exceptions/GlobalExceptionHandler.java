@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorMessageResponse>handleValidationException(MethodArgumentNotValidException ex){
+    public ResponseEntity<ErrorMessageResponse> handleValidationException(MethodArgumentNotValidException ex) {
         log.error("Received a validation error", ex);
 
         String detailedMessage = ex
@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
                 .getFieldErrors()
                 .stream()
                 .map(fieldError ->
-                    fieldError.getField() + ": " + fieldError.getDefaultMessage()
+                        fieldError.getField() + ": " + fieldError.getDefaultMessage()
                 )
                 .collect(Collectors.joining(", "));
 
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
-    public ResponseEntity<ErrorMessageResponse> handleIllegalArgumentException(IllegalArgumentException ex){
+    public ResponseEntity<ErrorMessageResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("Received an illegal argument", ex);
 
         var errorMessageResponse = new ErrorMessageResponse(
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = NoSuchElementException.class)
-    public ResponseEntity<ErrorMessageResponse> handleNoSuchElementException(NoSuchElementException ex){
+    public ResponseEntity<ErrorMessageResponse> handleNoSuchElementException(NoSuchElementException ex) {
         log.error("Received an element not found", ex);
 
         var errorMessageResponse = new ErrorMessageResponse(

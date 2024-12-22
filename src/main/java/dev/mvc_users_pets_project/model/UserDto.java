@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record UserDto (
+public record UserDto(
         @Null
         Long id,
 
@@ -24,18 +24,18 @@ public record UserDto (
         @JsonProperty("name")
         String firstName,
 
-        @NotNull
+        @NotNull(message = "user email is null")
         @Email(message = "incorrect email")
         String email,
 
-        @NotNull
-        @Min(value = 12, message = "The user is too young")
+        @NotNull(message = "user age is null")
+        @Min(value = 14, message = "The user is too young")
         @Max(value = 130, message = "The user too old")
         Integer age,
 
         @NonNull
         List<PetDto> pets
-    ){
+) {
     public UserDto(Long id, String firstName, String email, Integer ages) {
         this(id, firstName, email, ages, new CopyOnWriteArrayList<>());
     }
