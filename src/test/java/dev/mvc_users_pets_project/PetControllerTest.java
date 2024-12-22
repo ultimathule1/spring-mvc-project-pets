@@ -51,9 +51,9 @@ public class PetControllerTest {
         String petJson = objectMapper.writeValueAsString(petDto);
 
         String createdPetJson = mockMvc.perform(post(BASE_URL + "/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(petJson)
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(petJson)
+                )
                 .andExpect(status().is(HttpStatus.CREATED.value()))
                 .andReturn()
                 .getResponse()

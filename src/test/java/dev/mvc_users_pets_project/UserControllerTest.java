@@ -98,17 +98,17 @@ public class UserControllerTest {
     @Test
     void shouldNotBeValidForCreateUser() throws Exception {
         UserDto user = new UserDto(
-            null,
-            " ",
-            "asd@",
-            38
+                null,
+                " ",
+                "asd@",
+                38
         );
 
         String userJson = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(post(BASE_URL + "/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
