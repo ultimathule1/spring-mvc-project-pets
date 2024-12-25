@@ -1,8 +1,9 @@
 package dev.mvc_users_pets_project.controllers;
 
-import dev.mvc_users_pets_project.model.PetDto;
+import dev.mvc_users_pets_project.model.pets.Pet;
+import dev.mvc_users_pets_project.model.pets.PetDto;
+import dev.mvc_users_pets_project.model.pets.PetDtoConverter;
 import dev.mvc_users_pets_project.services.PetService;
-import dev.mvc_users_pets_project.services.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -24,57 +24,55 @@ import java.util.List;
 @RequestMapping("/pets")
 public class PetController {
     private final PetService petService;
-    private final UserService userService;
+    private final PetDtoConverter petDtoConverter;
     private static final Logger log = LoggerFactory.getLogger(PetController.class);
 
-    public PetController(PetService petService, UserService userService) {
+    public PetController(PetService petService, PetDtoConverter petDtoConverter) {
         this.petService = petService;
-        this.userService = userService;
+        this.petDtoConverter = petDtoConverter;
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<PetDto> createdPet(
             @Valid @RequestBody PetDto petDto) {
-        var savedPet = petService.savePet(petDto);
-        userService.addPetToUser(savedPet);
-        log.info("Get request: (Get) Saved pet: {}", savedPet);
+        log.info("Get request: (POST) Save pet: {}", petDto);
+        var savedPet = petService.savePet(petDtoConverter.toEntity(petDto));
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(savedPet);
+                .body(petDtoConverter.toDto(savedPet));
     }
 
     @GetMapping("/{id}")
     public PetDto getPetById(@PathVariable Long id) {
-        var foundPet = petService.findPetById(id);
-        log.info("Get request: (Get) Get pet by id: {}", foundPet);
-        return foundPet;
+        log.info("Get request: (Get) Get pet by id: {}", id);
+        return petDtoConverter.toDto(petService.findPetById(id));
     }
 
     @GetMapping
     public List<PetDto> getAllPets() {
-        List<PetDto> pets = petService.getAllPets();
-        log.info("Get request: (Get) All pets: {}", pets);
-        return pets;
+        log.info("Get request: (Get) get all pets");
+        return petService.getAllPets()
+                .stream()
+                .map(petDtoConverter::toDto)
+                .toList();
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public PetDto updatedPet(
             @PathVariable("id") Long id,
             @Valid @RequestBody PetDto petDto) {
-        var updatePet = petService.updatePet(id, petDto);
-        log.error("update pet: {}", updatePet);
-        userService.changePetToUser(updatePet);
-        log.info("Get request: (Update) Updated pet: {}", updatePet);
-        return updatePet;
+        log.info("Get request: (Put) Update pet: {} with id {}", petDto, id);
+        var updatePet = petService.updatePet(id, petDtoConverter.toEntity(petDto));
+        return petDtoConverter.toDto(updatePet);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/{id}")
     public PetDto deletePet(
-            @RequestParam("id") Long id
+            @PathVariable Long id
     ) {
-        PetDto deletedPet = petService.deletePet(id);
-        userService.deletePetFromUser(deletedPet);
-        log.info("Get request: (Delete) Deleted pet: {}", deletedPet);
-        return deletedPet;
+        log.info("Get request: (Delete) Delete pet id: {}", id);
+        Pet deletedPet = petService.deletePet(id);
+        return petDtoConverter.toDto(deletedPet);
     }
 }

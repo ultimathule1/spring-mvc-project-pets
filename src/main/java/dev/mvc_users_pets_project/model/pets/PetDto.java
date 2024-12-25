@@ -1,4 +1,4 @@
-package dev.mvc_users_pets_project.model;
+package dev.mvc_users_pets_project.model.pets;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;

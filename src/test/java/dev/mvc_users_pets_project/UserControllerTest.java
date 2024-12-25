@@ -1,7 +1,9 @@
 package dev.mvc_users_pets_project;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.mvc_users_pets_project.model.UserDto;
+import dev.mvc_users_pets_project.model.users.User;
+import dev.mvc_users_pets_project.model.users.UserDto;
+import dev.mvc_users_pets_project.model.users.UserDtoConverter;
 import dev.mvc_users_pets_project.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-public class UserControllerTest {
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -27,16 +31,24 @@ public class UserControllerTest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserDtoConverter userDtoConverter;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String BASE_URL = "/users";
 
     @Test
     void shouldCreateValidUser() throws Exception {
-        UserDto user = createTestUser();
+        UserDto user = new UserDto(
+                null,
+                "Antony",
+                "rop@ya.ru",
+                28
+        );
 
         String userJson = objectMapper.writeValueAsString(user);
 
-        String resultUserJson = mockMvc.perform(post(BASE_URL + "/add")
+        String resultUserJson = mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson)
                 )
@@ -56,9 +68,7 @@ public class UserControllerTest {
     @Test
     void shouldGetUserById() throws Exception {
         Long idForGet = 1L;
-        UserDto user = createTestUser();
-
-        userService.saveUser(user);
+        UserDto user = createAndSaveTestUser();
 
         String resultUserJson = mockMvc.perform(get(BASE_URL + "/" + idForGet)
                 )
@@ -76,9 +86,7 @@ public class UserControllerTest {
 
     @Test
     void shouldGetUserNotFound() throws Exception {
-        UserDto user = createTestUser();
-
-        userService.saveUser(user);
+        UserDto user = createAndSaveTestUser();
 
         mockMvc.perform(get(BASE_URL + "/" + 2))
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
@@ -88,11 +96,20 @@ public class UserControllerTest {
     void shouldDeleteUserById() throws Exception {
         Long idForDelete = 1L;
 
-        UserDto user = createTestUser();
-        userService.saveUser(user);
+        UserDto user = createAndSaveTestUser();
 
-        mockMvc.perform(delete(BASE_URL + "/delete?id=" + idForDelete))
-                .andExpect(status().is(HttpStatus.OK.value()));
+        int sizeBeforeDelete = userService.getAllUsers().size();
+        String deletedUserJson = mockMvc.perform(delete(BASE_URL + "/" + idForDelete))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        UserDto resultUser = objectMapper.readValue(deletedUserJson, UserDto.class);
+        Assertions.assertEquals(idForDelete, resultUser.id());
+        Assertions.assertEquals(user.firstName(), resultUser.firstName());
+        Assertions.assertEquals(user.email(), resultUser.email());
+        Assertions.assertEquals(sizeBeforeDelete - 1, userService.getAllUsers().size());
     }
 
     @Test
@@ -106,18 +123,21 @@ public class UserControllerTest {
 
         String userJson = objectMapper.writeValueAsString(user);
 
-        mockMvc.perform(post(BASE_URL + "/add")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
-    private UserDto createTestUser() {
-        return new UserDto(
+    private UserDto createAndSaveTestUser() {
+        UserDto userDto = new UserDto(
                 null,
-                "Hoegaarden",
-                "hug@rumbler.ru",
-                18
+                "some user",
+                "ya@rumbler.ru",
+                44
         );
+
+        User savedUser = userService.saveUser(userDtoConverter.toEntity(userDto));
+        return userDtoConverter.toDto(savedUser);
     }
 }

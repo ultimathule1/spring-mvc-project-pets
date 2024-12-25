@@ -1,7 +1,8 @@
-package dev.mvc_users_pets_project.model;
+package dev.mvc_users_pets_project.model.users;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.mvc_users_pets_project.model.pets.PetDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
