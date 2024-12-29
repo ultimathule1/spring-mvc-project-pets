@@ -1,6 +1,5 @@
 package dev.mvc_users_pets_project.controllers;
 
-import dev.mvc_users_pets_project.model.pets.Pet;
 import dev.mvc_users_pets_project.model.pets.PetDto;
 import dev.mvc_users_pets_project.model.pets.PetDtoConverter;
 import dev.mvc_users_pets_project.services.PetService;
@@ -33,9 +32,9 @@ public class PetController {
     }
 
     @PostMapping
-    public ResponseEntity<PetDto> createdPet(
+    public ResponseEntity<PetDto> createPet(
             @Valid @RequestBody PetDto petDto) {
-        log.info("Get request: (POST) Save pet: {}", petDto);
+        log.info("Received request: (POST) Save pet: {}", petDto);
         var savedPet = petService.savePet(petDtoConverter.toEntity(petDto));
 
         return ResponseEntity
@@ -45,13 +44,13 @@ public class PetController {
 
     @GetMapping("/{id}")
     public PetDto getPetById(@PathVariable Long id) {
-        log.info("Get request: (Get) Get pet by id: {}", id);
+        log.info("Received request: (GET) Get pet by id: {}", id);
         return petDtoConverter.toDto(petService.findPetById(id));
     }
 
     @GetMapping
     public List<PetDto> getAllPets() {
-        log.info("Get request: (Get) get all pets");
+        log.info("Received request: (GET) get all pets");
         return petService.getAllPets()
                 .stream()
                 .map(petDtoConverter::toDto)
@@ -59,20 +58,22 @@ public class PetController {
     }
 
     @PutMapping("/{id}")
-    public PetDto updatedPet(
+    public PetDto updatePet(
             @PathVariable("id") Long id,
             @Valid @RequestBody PetDto petDto) {
-        log.info("Get request: (Put) Update pet: {} with id {}", petDto, id);
+        log.info("Received request: (PUT) Update pet: {} with id {}", petDto, id);
         var updatePet = petService.updatePet(id, petDtoConverter.toEntity(petDto));
         return petDtoConverter.toDto(updatePet);
     }
 
     @DeleteMapping("/{id}")
-    public PetDto deletePet(
+    public ResponseEntity<Void> deletePet(
             @PathVariable Long id
     ) {
-        log.info("Get request: (Delete) Delete pet id: {}", id);
-        Pet deletedPet = petService.deletePet(id);
-        return petDtoConverter.toDto(deletedPet);
+        log.info("Received request: (DELETE) Delete pet id: {}", id);
+        petService.deletePet(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 }

@@ -37,7 +37,7 @@ public class UserController {
     public ResponseEntity<UserDto> createUser(
             @RequestBody @Valid UserDto userDto
     ) {
-        log.info("Get request: (Post) Creating user: {}", userDto);
+        log.info("Received request: (POST) Creating user: {}", userDto);
         User createdUser = userService.saveUser(userDtoConverter.toEntity(userDto));
 
         return ResponseEntity
@@ -49,14 +49,14 @@ public class UserController {
     public UserDto getUserById(
             @PathVariable long id
     ) {
-        log.info("Get request: (Get) Get user: {}", id);
+        log.info("Received request: (GET) Get user: {}", id);
         var user = userService.findUserById(id);
         return userDtoConverter.toDto(user);
     }
 
     @GetMapping
     public List<UserDto> getAllUsers() {
-        log.info("Get request: (Get) Get all users");
+        log.info("Received request: (GET) Get all users");
         return userService.getAllUsers()
                 .stream()
                 .map(userDtoConverter::toDto)
@@ -67,17 +67,19 @@ public class UserController {
     public UserDto updateUser(
             @PathVariable("id") Long id,
             @RequestBody @Valid UserDto userDto) {
-        log.info("Get request: (Put) Update user: {}", userDto);
+        log.info("Received request: (PUT) Update user: {}", userDto);
         User updatedUser = userService.updateUser(id, userDtoConverter.toEntity(userDto));
         return userDtoConverter.toDto(updatedUser);
     }
 
     @DeleteMapping("/{id}")
-    public UserDto deleteUser(
+    public ResponseEntity<Void> deleteUser(
             @PathVariable Long id
     ) {
-        log.info("Get request: (Delete) Delete user with id: {}", id);
-        User user = userService.deleteUser(id);
-        return userDtoConverter.toDto(user);
+        log.info("Received request: (DELETE) Delete user with id: {}", id);
+        userService.deleteUser(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 }

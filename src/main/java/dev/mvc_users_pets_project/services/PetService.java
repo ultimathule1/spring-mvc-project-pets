@@ -54,8 +54,8 @@ public class PetService {
                 pet.name(),
                 pet.userId()
         );
-        savePetToUser(updatedPet);
         deletePet(id);
+        savePetToUser(updatedPet);
         return updatedPet;
     }
 
@@ -65,13 +65,13 @@ public class PetService {
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException(PET_NOT_FOUND));
 
-        Pet deletedPet = user.pets().stream()
+        Pet petToDelete = user.pets().stream()
                 .filter(u -> u.id() == id)
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException(PET_NOT_FOUND));
 
-        user.pets().remove(deletedPet);
-        return deletedPet;
+        user.pets().remove(petToDelete);
+        return petToDelete;
     }
 
     private void savePetToUser(Pet pet) {
